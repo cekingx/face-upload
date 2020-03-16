@@ -7,6 +7,7 @@ import okhttp3.RequestBody
 import okio.BufferedSink
 import java.io.File
 import java.io.FileInputStream
+import okhttp3.MediaType.Companion.toMediaType
 
 class UploadRequestBody(
     private val file: File,
@@ -14,7 +15,7 @@ class UploadRequestBody(
     private val callback: UploadCallback
 ) : RequestBody() {
 
-    override fun contentType() = MediaType.parse("$contentType/*")
+    override fun contentType() = "$contentType/*".toMediaType()
 
     override fun contentLength() = file.length()
 

@@ -1,16 +1,14 @@
 package net.simplifiedcoding.imageuploader
 
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,6 +20,7 @@ import java.io.FileOutputStream
 class MainActivity : AppCompatActivity(), UploadRequestBody.UploadCallback {
 
     private var selectedImageUri: Uri? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,15 +70,17 @@ class MainActivity : AppCompatActivity(), UploadRequestBody.UploadCallback {
         val outputStream = FileOutputStream(file)
         inputStream.copyTo(outputStream)
 
+        val nik = nik_input.text.toString();
+
         progress_bar.progress = 0
         val body = UploadRequestBody(file, "image", this)
         MyAPI().uploadImage(
             MultipartBody.Part.createFormData(
-                "image",
+                "foto",
                 file.name,
                 body
             ),
-            RequestBody.create(MediaType.parse("multipart/form-data"), "json")
+            nik.toRequestBody("multipart/form-data".toMediaType())
         ).enqueue(object : Callback<UploadResponse> {
             override fun onFailure(call: Call<UploadResponse>, t: Throwable) {
                 layout_root.snackbar(t.message!!)
@@ -91,8 +92,15 @@ class MainActivity : AppCompatActivity(), UploadRequestBody.UploadCallback {
                 response: Response<UploadResponse>
             ) {
                 response.body()?.let {
-                    layout_root.snackbar(it.message)
+//                    layout_root.snackbar(it.confidence.toString())
                     progress_bar.progress = 100
+                    val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
+                        putExtra("nik", it.nik)
+                        putExtra("nama", it.nama)
+                        putExtra("confidence", it.confidence)
+                    }
+
+                    startActivity(intent)
                 }
             }
         })

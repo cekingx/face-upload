@@ -1,7 +1,7 @@
 package net.simplifiedcoding.imageuploader
 
 data class UploadResponse(
-    val error: Boolean,
-    val message: String,
-    val image: String
+    val nik: String,
+    val nama: String,
+    val confidence: String
 )
